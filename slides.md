@@ -14,7 +14,7 @@ duration: 30min
 ---
 
 # Proteins, Protein Language Models, and Their Interpretability
-Understanding the Building Blocks and how we model them
+Understanding the Building Blocks of life.
 
 <div @click="$slidev.nav.next" class="mt-12 py-1" hover:bg="white op-10">
   Press Space for next page <carbon:arrow-right />
@@ -30,9 +30,7 @@ What you will take away today?
 2) History of PLMs (5m)
 3) SAE for PLMs, interpretation of SAE's features, clustering and analysis (30m)
 4) LLM for interpretation of SAE of proteins (20m)
-5) Basic of Bioinformatics: MSA aligments. (10m)
-6) Hypothesis of protein
-7) Is PLM something more than "evolutionary statistics"? (40m) 
+
 
 
 
@@ -44,11 +42,6 @@ src: ./pages/introduction.md
 
 ---
 src: ./pages/intrapro.md
----
-
-
----
-src: ./pages/plms-statistic.md
 ---
 
 

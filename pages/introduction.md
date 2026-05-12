@@ -49,6 +49,23 @@ Amino acids connect through a dehydration synthesis reaction.
 
 ---
 
+# The Four Levels of Protein Structure
+
+The sequence of amino acids determine the final 3D shape.
+
+1. **Primary Structure**: The linear sequence of amino acids.
+2. **Secondary Structure**: Local folding patterns (alpha-helices and beta-sheets).
+3. **Tertiary Structure**: The overall 3D shape of a single polypeptide.
+4. **Quaternary Structure**: Arrangement of multiple protein subunits.
+
+<!--
+Snížení komplexity pokud to nepotřebuju.
+
+valence shell
+-->
+
+---
+
 # Properties Drive Folding
 
 Once linked into a chain, the individual properties of amino acids determine how the protein "collapses" into a 3D shape.
@@ -73,20 +90,7 @@ Once linked into a chain, the individual properties of amino acids determine how
 </v-click>
 </div>
 
----
 
-# The Four Levels of Protein Structure
-
-The sequence of amino acids determine the final 3D shape.
-
-1. **Primary Structure**: The linear sequence of amino acids.
-2. **Secondary Structure**: Local folding patterns (alpha-helices and beta-sheets).
-3. **Tertiary Structure**: The overall 3D shape of a single polypeptide.
-4. **Quaternary Structure**: Arrangement of multiple protein subunits.
-
-<!--
-Snížení komplexity pokud to nepotřebuju. 
--->
 
 ---
 layout: image-right
@@ -112,8 +116,63 @@ Většina vlastností, funkcí a podobných proteinu se odvyjí od protein foldi
 -->
 
 ---
+layout: center
+---
+
+# Multiple Sequence Alignment (MSA)
+
+<!--
+
+Před tím si ale musíme vysvětli co to je MSA a proč je to tak důležité?
+-->
+
+---
+
+# What is Multiple Sequence Alignment ?
+
+MSA is the process of aligning *biological* sequences to identify regions of similarity that may be a consequence of evolutionary relationships.
+
+<MsaVisualizer :clicks="$slidev.nav.clicks" />
+
+<div v-click></div>
+
+<!--
+MSA nám umožňuje vidět evoluci v přímém přenosu. 
+1) Nejdřív máme sekvence "vypadající" podobně, ale neshodují se v pozicích.
+2) Po zarovnání vidíme vertikální sloupce stejných nebo podobných aminokyselin. 
+To jsou ta místa, která jsou pro protein důležitá – pokud by tam došlo k mutaci, protein by přestal fungovat.
+-->
+
+---
+
+# Why is MSA powerful for PLMs?
+
+While single-sequence models (like ESM-2) must *infer* evolution, MSA-based models have it *explicitly*.
+
+<div class="grid grid-cols-2 gap-4">
+<div>
+
+- **Input**: A stack of related sequences.
+- **Context**: Co-evolutionary signals.
+- **Accuracy**: Extremely High for contact prediction.
+- **Models**: MSA Transformer, AlphaFold (?).
+
+</div>
+<div class="flex items-center justify-center">
+  <img src="/images/MSA.png" class="rounded shadow-lg border border-gray-200" />
+</div>
+</div>
+
+<!--
+- MSA modely jako MSA Transformer berou jako vstup celou tuhle "kostku" dat. 
+- To je ten důvod, proč byl AlphaFold tak úspěšný – MSA je extrémně silný prediktor struktury.
+- ale je tady jedna nevýhoda: Model se neučí predikovat stukturu ale dělá "navlékaní", dekompozici
+- jde vlastně o to že se naučí HMM vidím "X" to se vždycky složí na X
+- Tento paper vlastně chce tak zhruba dokázat že model co bere jen jako sekvenci na vstupu dělá vlastně uvnitř MSA, a potom dělá to co MSA based model
+-->
 
 
+---
 # From Biology to Language
 
 If we look at a protein as a 1D sequence of amino acids, it starts to look like a language.

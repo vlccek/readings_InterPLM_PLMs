@@ -6,61 +6,6 @@ layout: center
 ##### Zhidian Zhang, Hannah K. Wayment-Steele, Garyk Brixi, and Sergey Ovchinnikov 
 
 
----
-layout: center
----
-
-# Multiple Sequence Alignment (MSA)
-
-<!--
-
-Před tím si ale musíme vysvětli co to je MSA a proč je to tak důležité?
--->
-
----
-
-# What is Multiple Sequence Alignment ?
-
-MSA is the process of aligning *biological* sequences to identify regions of similarity that may be a consequence of evolutionary relationships.
-
-<MsaVisualizer :clicks="$slidev.nav.clicks" />
-
-<div v-click></div>
-
-<!--
-MSA nám umožňuje vidět evoluci v přímém přenosu. 
-1) Nejdřív máme sekvence "vypadající" podobně, ale neshodují se v pozicích.
-2) Po zarovnání vidíme vertikální sloupce stejných nebo podobných aminokyselin. 
-To jsou ta místa, která jsou pro protein důležitá – pokud by tam došlo k mutaci, protein by přestal fungovat.
--->
-
----
-
-# Why is MSA powerful for PLMs?
-
-While single-sequence models (like ESM-2) must *infer* evolution, MSA-based models have it *explicitly*.
-
-<div class="grid grid-cols-2 gap-4">
-<div>
-
-- **Input**: A stack of related sequences.
-- **Context**: Co-evolutionary signals.
-- **Accuracy**: Extremely High for contact prediction.
-- **Models**: MSA Transformer, AlphaFold (?).
-
-</div>
-<div class="flex items-center justify-center">
-  <img src="/images/MSA.png" class="rounded shadow-lg border border-gray-200" />
-</div>
-</div>
-
-<!--
-- MSA modely jako MSA Transformer berou jako vstup celou tuhle "kostku" dat. 
-- To je ten důvod, proč byl AlphaFold tak úspěšný – MSA je extrémně silný prediktor struktury.
-- ale je tady jedna nevýhoda: Model se neučí predikovat stukturu ale dělá "navlékaní", dekompozici
-- jde vlastně o to že se naučí HMM vidím "X" to se vždycky složí na X
-- Tento paper vlastně chce tak zhruba dokázat že model co bere jen jako sekvenci na vstupu dělá vlastně uvnitř MSA, a potom dělá to co MSA based model
--->
 
 
 
@@ -105,13 +50,11 @@ layout: default
 
 # Debunking Physics: The Isoform Trap
 
-To test Hypothesis 1, the authors used **protein isoforms** (sequences formed from alternative splicing that disrupt ordered domains).
+To test Hypothesis 1, using the **protein isoforms** (sequences formed from alternative splicing that disrupt ordered domains).
 
 - Isoform sequences are missing parts of the full structure and are generally unfolded in reality.
 - **AlphaFold2, OmegaFold, and ESMFold** predict them as rigid, structured fragments.
 - These models leave nonphysical patches of hydrophobic residues completely exposed (high SAP scores).
-
-**Conclusion:** pLMs do not simulate biophysics.
 
 <!--
 Aby otestovali první hypotézu o fyzice, použili chytrý chyták – izoformy. 
@@ -120,22 +63,48 @@ Ale AF2 i ESMFold takový protein nesmyslně poskládají jako by byl kompletní
 -->
 
 ---
-layout: center
+layout: default
+---
+
+# From 4D Tensor to 2D Contact Map
+
+How do we convert the massive $L \times 20 \times L \times 20$ Categorical Jacobian into a clean $L \times L$ contact map?
+
+**Step 1: The Frobenius Norm (Collapse the chemistry)**
+For each pair of positions $(i, j)$, we have a $20 \times 20$ table of interaction weights. We collapse this into a single "interaction strength" score by taking the square root of the sum of squared weights:
+$$m_{ij} = \sqrt{\sum_{n=1}^{20} \sum_{m=1}^{20} W[i, n, j, m]^2}$$
+
+**Step 2: Average Product Correction (APC)**
+The raw $L \times L$ map contains background noise (e.g., highly reactive exposed residues). We subtract this systemic noise using APC:
+$$APC(i, j) = m_{ij} - \frac{\sum_{i'} m_{i'j} \sum_{j'} m_{ij'}}{\sum_{i',j'} m_{i'j'}}$$
+
+**Result:** A highly accurate 2D contact map (Precision @ L/2 = 0.80 for ESM-2 3B).
+
+<!--
+Přesouváme se k tomu, jak z toho gigantického 4D tenzoru uděláme naši finální 2D mapu. 
+
+První krok je tzv. Frobeniusova norma [1]. Pro každou myslitelnou dvojici pozic v proteinu máme tabulku 20x20 hodnot – to jsou všechny chemické kombinace aminokyselin. Abychom z toho udělali jedno číslo, zkrátka všechny tyto hodnoty umocníme na druhou, sečteme je a uděláme z nich odmocninu [1]. Získáme tak hrubou sílu vazby mezi pozicí "i" a pozicí "j".
+
+Druhý krok je APC, neboli Average Product Correction [1, 2]. Ta hrubá mapa má totiž problém – některé aminokyseliny, typicky ty na povrchu, tvoří spoustu "šumu", protože se zdají reagovat se vším. APC funguje tak, že pro každou buňku spočítá průměrný šum jejího řádku a sloupce a tento šum matematicky odečte [2].
+
+Výsledkem je čistá 2D mapa kontaktů. A jak už jsme si řekli dříve, přesnost této mapy spočítané z ESM-2 překonává starší lineární modely a dosahuje skóre 0.80 [3, 4].
+-->
+
+
 ---
 
 # The "Categorical Jacobian"
 
 How do we extract coevolutionary signal from ESM-2 in a completely *unsupervised* way?
 
-<JacobianVisualizer :clicks="$slidev.nav.clicks" />
+The **Categorical Jacobian** measures how a change in the input amino acid at all position affects the output logit at all position :
 
-<div v-click></div>
-<div v-click></div>
-<div v-click></div>
+**Aggregate**: The result is an $L \times 20 \times L \times 20$ tensor capturing all pairwise dependencies.
 
 <!--
 Když tedy modely nepočítají fyziku, jak z nich dostat to, co si skutečně myslí o evoluci? Autoři vyvinuli metodu "Kategorický jakobián".
-Je to metoda bez učitele. Postupně zmutují každou pozici v proteinu na všech 20 aminokyselin a sledují, jak moc tato změna ovlivní zbytek proteinu. Získají tak obrovskou matici, která mapuje všechny párové závislosti.
+Místo složitých animací je tu čistá matematika: Jakobián je v podstatě matice parciálních derivací. Protože jsou aminokyseliny diskrétní, počítá se to jako rozdíl v logitech (probabilities) před a po mutaci.
+Získáme tak mapu, která říká: "Když změním tohle tady, co se stane s tamtím támhle?".
 -->
 
 ---

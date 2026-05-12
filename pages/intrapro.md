@@ -11,8 +11,8 @@ Jde o to že udělali framework na interpretaci Features z PLM.
 
 
 ## Introduction & Motivation
-*   **The "Black Box" Problem:** Protein language models (PLMs) like ESM-2 achieve impressive performance in predicting protein structure and function, but their internal mechanisms are poorly understood. Furthermore, I'm suggesting that interpreting a language we don't know is even harder than with natural language (NL). 
-*   **Research Goal:** To create a systematic framework using Sparse Autoencoders (SAEs) to decompose these complex, tangled representations into clear, understandable biological features.
+*   Protein language models (PLMs) like ESM-2 achieve impressive performance in predicting protein structure and function, but their internal mechanisms are poorly understood. Furthermore, I'm suggesting that interpreting a language we don't know is even harder than with natural language (NL). 
+*   - using Sparse Autoencoders (SAEs) to decompose these complex, tangled representations into clear, understandable biological features.
 
 
 
@@ -28,8 +28,8 @@ Jde o model ESM-2, což je aktuálně asi nejlepší free to use model.
 ## Methodology: Sparse Autoencoders (SAEs)
 *   **The Tool:** SAEs are trained on the hidden amino acid embeddings of the ESM-2 model.
 *   **Experiments:**
-    - **`ESM2-8M` (6L):** 320 neurons expanded into 10,420 latent features (32x)
-    - **`ESM2-650M` (33L):** Same 10,422 latent features (8x expansion)
+    - **`ESM2-8M` (6L):** expanded into 10,420 latent features per layer
+    - **`ESM2-650M` (33L):** Same 10,420 latent features per selected 6 layers
 
 
 ---
@@ -43,7 +43,7 @@ layout: center
 <div class="mt-4 text-center text-sm opacity-60">
   <span class="text-green-500 font-bold">Green:</span> Random Weights | 
   <span class="text-blue-500 font-bold">Blue:</span> Neurons | 
-  <span class="text-pink-500 font-bold">pink:</span> SAE Features
+  <span class="text-pink-500 font-bold">Pink:</span> SAE Features
 </div>
 
 <!--
@@ -61,7 +61,7 @@ layout: center
 
 <div class="mt-4 text-center text-sm opacity-60">
   <span class="text-blue-500 font-bold">Blue:</span> Neurons | 
-  <span class="text-pink-500 font-bold">pink:</span> SAE Features
+  <span class="text-pink-500 font-bold">Pink:</span> SAE Features
 </div>
 
 <!--
