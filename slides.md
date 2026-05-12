@@ -30,8 +30,9 @@ What you will take away today?
 2) History of PLMs (5m)
 3) SAE for PLMs, interpretation of SAE's features, clustering and analysis (30m)
 4) LLM for interpretation of SAE of proteins (20m)
-5) Is PLM something more than "evolutionary statistics"? (40m) 
-6) ??? Pizza ?
+5) Basic of Bioinformatics: MSA aligments. (10m)
+6) Hypothesis of protein
+7) Is PLM something more than "evolutionary statistics"? (40m) 
 
 
 
@@ -40,9 +41,16 @@ What you will take away today?
 src: ./pages/introduction.md
 ---
 
+
 ---
 src: ./pages/intrapro.md
 ---
+
+
+---
+src: ./pages/plms-statistic.md
+---
+
 
 ---
 layout: center
